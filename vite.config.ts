@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './', // Chemin relatif pour éviter les problèmes d'hébergement
+  base: '/', // Chemin absolu pour Netlify
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -12,6 +12,9 @@ export default defineConfig({
     minify: 'terser',
     rollupOptions: {
       output: {
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
         manualChunks: {
           vendor: ['react', 'react-dom'],
           utils: ['./src/components/SystemEngine/AutomationCore', './src/components/Performance/PerformanceEngine']
