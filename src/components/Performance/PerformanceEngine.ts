@@ -146,7 +146,9 @@ export class QuantumPerformanceEngine {
     if (this.cache.size >= this.config.maxCacheSize) {
       // LRU eviction
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
     }
 
     const cacheEntry = {
@@ -212,7 +214,7 @@ export class QuantumPerformanceEngine {
     } else {
       // Fallback pour les anciens navigateurs
       Object.entries(properties).forEach(([prop, value]) => {
-        element.style.setProperty(prop, value);
+        (element as HTMLElement).style.setProperty(prop, value);
       });
     }
   }

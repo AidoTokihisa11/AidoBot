@@ -104,7 +104,7 @@ export class SystemAutomationEngine {
     return 'general';
   }
 
-  private async executeSystemAction(type: string, message: string, context: SystemContext): Promise<string> {
+  private async executeSystemAction(type: string, _message: string, _context: SystemContext): Promise<string> {
     // Simulation d'un délai de traitement réaliste
     await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 600));
 

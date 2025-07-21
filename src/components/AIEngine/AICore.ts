@@ -72,7 +72,17 @@ export class QuantumAI {
     const response = await this.generateResponse(message, context, analytics);
     
     // Apprentissage adaptatif
-    this.updateNeuralPatterns(message, response);
+    this.updateNeuralPatterns({
+      ...response,
+      metadata: {
+        timestamp: Date.now(),
+        confidence: 0.9,
+        processingTime: performance.now() - startTime,
+        contextual: true,
+        analytics,
+        neuralActivation: {}
+      }
+    });
     
     const processingTime = performance.now() - startTime;
     
@@ -150,10 +160,10 @@ export class QuantumAI {
 
   private async generateResponse(message: string, context: any, analytics: AIAnalytics): Promise<Omit<AIResponse, 'metadata'>> {
     const templates = this.getResponseTemplates(analytics);
-    const selectedTemplate = this.selectOptimalTemplate(templates, analytics);
+    const selectedTemplate = this.selectOptimalTemplate(templates);
     
     const confidence = this.calculateConfidence(message, analytics);
-    const suggestions = this.generateSuggestions(analytics, context);
+    const suggestions = this.generateSuggestions();
     
     return {
       text: this.personalizeResponse(selectedTemplate, context),
@@ -195,7 +205,7 @@ export class QuantumAI {
     ];
   }
 
-  private selectOptimalTemplate(templates: string[], analytics: AIAnalytics): string {
+  private selectOptimalTemplate(templates: string[]): string {
     // Sélection basée sur l'IA et les patterns neuraux
     const randomIndex = Math.floor(Math.random() * templates.length);
     return templates[randomIndex];
@@ -211,30 +221,23 @@ export class QuantumAI {
     return Math.min(confidence, 0.99);
   }
 
-  private generateSuggestions(analytics: AIAnalytics, context: any): string[] {
+  private generateSuggestions(): string[] {
     const suggestions: string[] = [];
     
-    if (analytics.topics.includes('musique')) {
-      suggestions.push("🎵 Voulez-vous que je recommande des playlists personnalisées ?");
-      suggestions.push("🎧 Activons le mode DJ IA pour une expérience musicale optimale !");
-    }
-    
-    if (analytics.topics.includes('jeux')) {
-      suggestions.push("🎮 Lançons un tournoi IA avec récompenses automatiques ?");
-      suggestions.push("🏆 Je peux créer des défis personnalisés basés sur vos préférences !");
-    }
-    
-    if (analytics.engagement > 0.7) {
-      suggestions.push("💬 Activons le mode conversation IA avancée ?");
-      suggestions.push("🧠 Voulez-vous explorer les fonctionnalités IA cachées ?");
-    }
+    // Suggestions génériques sans dépendances
+    suggestions.push("🎵 Voulez-vous que je recommande des playlists personnalisées ?");
+    suggestions.push("🎧 Activons le mode DJ pour une expérience musicale optimale !");
+    suggestions.push("🎮 Lançons un tournoi avec récompenses automatiques ?");
+    suggestions.push("🏆 Je peux créer des défis personnalisés basés sur vos préférences !");
+    suggestions.push("💬 Activons le mode conversation avancée ?");
+    suggestions.push("🧠 Voulez-vous explorer les fonctionnalités cachées ?");
     
     return suggestions;
   }
 
-  private personalizeResponse(template: string, context: any): string {
-    const userName = context?.user?.username || 'Membre';
-    const serverName = context?.server?.name || 'ce serveur';
+  private personalizeResponse(template: string, context: Record<string, unknown>): string {
+    const userName = (context?.user as { username?: string })?.username || 'Membre';
+    const serverName = (context?.server as { name?: string })?.name || 'ce serveur';
     
     return template
       .replace('{user}', userName)
@@ -242,7 +245,7 @@ export class QuantumAI {
       .replace('{time}', new Date().toLocaleTimeString('fr-FR'));
   }
 
-  private updateNeuralPatterns(message: string, response: AIResponse) {
+  private updateNeuralPatterns(response: AIResponse) {
     // Apprentissage adaptatif basé sur les interactions
     const topics = response.metadata?.analytics?.topics || [];
     const confidence = response.confidence;
