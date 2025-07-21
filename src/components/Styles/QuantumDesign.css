@@ -1,0 +1,673 @@
+/* ============================================================================
+   DESIGN SYSTEM RÉVOLUTIONNAIRE - INTERFACE QUANTIQUE
+   ============================================================================ */
+
+:root {
+  /* Variables quantiques pour l'IA */
+  --quantum-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --quantum-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --quantum-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --quantum-neural: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --quantum-danger: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --quantum-success: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  
+  /* Couleurs de l'IA */
+  --ai-glow: #00f5ff;
+  --ai-pulse: #ff006e;
+  --ai-neural: #8b5cf6;
+  --ai-quantum: #06ffa5;
+  
+  /* Espacements optimisés */
+  --space-quantum: clamp(0.5rem, 2vw, 2rem);
+  --space-neural: clamp(1rem, 3vw, 3rem);
+  --space-ai: clamp(1.5rem, 4vw, 4rem);
+  
+  /* Animations quantiques */
+  --timing-instant: 0.1s;
+  --timing-fast: 0.3s;
+  --timing-smooth: 0.5s;
+  --timing-slow: 0.8s;
+  --easing-quantum: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --easing-neural: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Reset ultra-optimisé */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Body avec optimisations GPU */
+body {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background: #0a0a0f;
+  color: #ffffff;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Container principal avec GPU acceleration */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ============================================================================
+   AIDOBOT PANEL - DESIGN RÉVOLUTIONNAIRE
+   ============================================================================ */
+
+.aidobot-panel {
+  display: flex;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at top, #1a1a2e 0%, #16213e 25%, #0f0f23 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.aidobot-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+      rgba(0, 245, 255, 0.15) 0%, 
+      transparent 40%);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+/* ============================================================================
+   SIDEBAR RÉVOLUTIONNAIRE
+   ============================================================================ */
+
+.aidobot-sidebar {
+  width: 320px;
+  background: rgba(15, 15, 35, 0.95);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(0, 245, 255, 0.3);
+  padding: var(--space-neural);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-neural);
+  position: relative;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.aidobot-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.aidobot-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, 
+    rgba(0, 245, 255, 0.05) 0%, 
+    transparent 50%, 
+    rgba(139, 92, 246, 0.05) 100%);
+  pointer-events: none;
+}
+
+/* Logo IA avec animations quantiques */
+.aidobot-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--quantum-primary);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 32px rgba(0, 245, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.aidobot-logo::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: rotate(45deg);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.aidobot-logo-icon {
+  font-size: 3rem;
+  color: var(--ai-glow);
+  text-shadow: 0 0 20px currentColor;
+  animation: pulse-glow 2s infinite ease-in-out;
+  z-index: 1;
+  position: relative;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    transform: scale(1);
+    text-shadow: 0 0 20px currentColor;
+  }
+  50% { 
+    transform: scale(1.1);
+    text-shadow: 0 0 30px currentColor, 0 0 40px currentColor;
+  }
+}
+
+.aidobot-logo-text {
+  z-index: 1;
+  position: relative;
+}
+
+.aidobot-logo-text h3 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff, var(--ai-glow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.2rem;
+}
+
+.aidobot-logo-text p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Menu révolutionnaire */
+.aidobot-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-quantum);
+}
+
+.menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menu-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 0 1rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.menu-section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.25rem;
+  width: 30px;
+  height: 2px;
+  background: var(--quantum-accent);
+  border-radius: 1px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all var(--timing-fast) var(--easing-quantum);
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  width: 100%;
+}
+
+.menu-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--quantum-accent);
+  transition: all var(--timing-fast) var(--easing-quantum);
+  z-index: -1;
+}
+
+.menu-item:hover::before {
+  left: 0;
+}
+
+.menu-item:hover {
+  color: #ffffff;
+  transform: translateX(8px);
+  box-shadow: 
+    0 8px 25px rgba(79, 172, 254, 0.4),
+    0 0 0 1px rgba(79, 172, 254, 0.3);
+}
+
+.menu-item.active {
+  background: var(--quantum-accent);
+  color: #ffffff;
+  transform: translateX(8px);
+  box-shadow: 
+    0 8px 25px rgba(79, 172, 254, 0.6),
+    0 0 0 2px rgba(79, 172, 254, 0.3);
+}
+
+.menu-item i {
+  font-size: 1.2rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* Statistiques AI en temps réel */
+.aidobot-stats {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 20px;
+  padding: 1.5rem;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.aidobot-stats::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--quantum-neural);
+  animation: neural-pulse 2s infinite;
+}
+
+@keyframes neural-pulse {
+  0%, 100% { opacity: 0.3; transform: scaleX(0); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+
+.aidobot-stats h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ai-neural);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all var(--timing-fast);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row:hover {
+  background: rgba(139, 92, 246, 0.1);
+  transform: translateX(4px);
+}
+
+.stat-value {
+  font-weight: 700;
+  color: var(--ai-quantum);
+  text-shadow: 0 0 10px currentColor;
+  animation: value-pulse 3s infinite ease-in-out;
+}
+
+@keyframes value-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ============================================================================
+   CONTENT AREA - ZONE PRINCIPALE
+   ============================================================================ */
+
+.aidobot-content {
+  flex: 1;
+  padding: var(--space-neural);
+  overflow-y: auto;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 172, 254, 0.3) transparent;
+}
+
+.aidobot-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.aidobot-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.aidobot-content::-webkit-scrollbar-thumb {
+  background: rgba(79, 172, 254, 0.3);
+  border-radius: 4px;
+}
+
+.aidobot-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 172, 254, 0.5);
+}
+
+/* Header révolutionnaire */
+.aidobot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-neural);
+  padding: 2rem;
+  background: rgba(15, 15, 35, 0.6);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  border: 1px solid rgba(0, 245, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.aidobot-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(0, 245, 255, 0.05) 0%, 
+    rgba(139, 92, 246, 0.05) 100%);
+  pointer-events: none;
+}
+
+.aidobot-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  background: var(--quantum-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+.aidobot-actions {
+  display: flex;
+  gap: 1rem;
+  z-index: 1;
+  position: relative;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all var(--timing-fast) var(--easing-quantum);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--quantum-accent);
+  transition: all var(--timing-fast) var(--easing-quantum);
+  z-index: -1;
+}
+
+.action-btn:hover::before {
+  left: 0;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+}
+
+.action-btn.primary {
+  background: var(--quantum-accent);
+  border-color: rgba(79, 172, 254, 0.5);
+  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+}
+
+.action-btn.primary:hover {
+  box-shadow: 0 8px 30px rgba(79, 172, 254, 0.6);
+}
+
+/* ============================================================================
+   MODULE GRID - GRILLE RÉVOLUTIONNAIRE
+   ============================================================================ */
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--space-neural);
+  margin-bottom: var(--space-neural);
+}
+
+.module-card {
+  background: rgba(15, 15, 35, 0.8);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--timing-smooth) var(--easing-quantum);
+  cursor: pointer;
+}
+
+.module-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(139, 92, 246, 0.1) 0%, 
+    rgba(0, 245, 255, 0.05) 100%);
+  opacity: 0;
+  transition: all var(--timing-smooth);
+  pointer-events: none;
+}
+
+.module-card:hover::before {
+  opacity: 1;
+}
+
+.module-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 
+    0 20px 40px rgba(139, 92, 246, 0.3),
+    0 0 0 1px rgba(139, 92, 246, 0.2);
+}
+
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.module-header h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.module-header h3 i {
+  color: var(--ai-neural);
+  text-shadow: 0 0 15px currentColor;
+}
+
+.module-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Toggle Switch Quantique */
+.module-toggle {
+  position: relative;
+}
+
+.toggle-switch {
+  width: 60px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  position: relative;
+  cursor: pointer;
+  transition: all var(--timing-fast) var(--easing-quantum);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: all var(--timing-fast) var(--easing-quantum);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch.active {
+  background: var(--quantum-accent);
+  border-color: rgba(79, 172, 254, 0.5);
+  box-shadow: 0 0 20px rgba(79, 172, 254, 0.4);
+}
+
+.toggle-switch.active::before {
+  transform: translateX(30px);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Performance boost pour les animations */
+.module-card,
+.action-btn,
+.menu-item,
+.toggle-switch {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Responsive design avancé */
+@media (max-width: 1200px) {
+  .module-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+  
+  .aidobot-sidebar {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .aidobot-panel {
+    flex-direction: column;
+  }
+  
+  .aidobot-sidebar {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: -100%;
+    z-index: 1000;
+    transition: left var(--timing-smooth) var(--easing-quantum);
+  }
+  
+  .aidobot-sidebar.open {
+    left: 0;
+  }
+  
+  .module-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .aidobot-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+/* Mode haute performance */
+.performance-mode .module-card::before,
+.performance-mode .aidobot-header::before,
+.performance-mode .aidobot-sidebar::before {
+  display: none;
+}
+
+.performance-mode .module-card:hover {
+  transform: none;
+}
+
+.performance-mode * {
+  animation: none !important;
+  transition: none !important;
+}
