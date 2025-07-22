@@ -2,14 +2,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import './App.css';
 import FormTab from './FormTab';
-import { RevolutionaryAidoBotPanel } from './RevolutionaryAidoBotPanel';
+import { ModernAidoBotPanel } from './ModernAidoBotPanel';
 
 interface UserSettings {
-  darkMode: boolean;
   language: 'fr' | 'en';
   notifications: boolean;
   autoSave: boolean;
-  theme: 'blue' | 'purple' | 'green' | 'orange';
   performanceMode: boolean;
 }
 
@@ -25,11 +23,9 @@ interface UserProfile {
 function App() {
   const [tab, setTab] = useState<'dashboard' | 'form' | 'analytics' | 'settings' | 'community' | 'profile' | 'aidobot'>('dashboard');
   const [settings, setSettings] = useState<UserSettings>({
-    darkMode: false,
     language: 'fr',
     notifications: true,
     autoSave: true,
-    theme: 'blue',
     performanceMode: false
   });
   const [userProfile, setUserProfile] = useState<UserProfile>({
@@ -57,24 +53,15 @@ function App() {
     }
   }, []);
 
-  // Applique le mode sombre
+  // Applique les paramètres
   useEffect(() => {
-    if (settings.darkMode) {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
-    }
-    
-    // Applique le thème de couleur
-    document.documentElement.setAttribute('data-theme', settings.theme);
-    
     // Applique le mode performance
     if (settings.performanceMode) {
       document.body.classList.add('performance-mode');
     } else {
       document.body.classList.remove('performance-mode');
     }
-  }, [settings.darkMode, settings.theme, settings.performanceMode]);
+  }, [settings.performanceMode]);
 
   // Fonctions simplifiées
   const handleTabChange = useCallback((newTab: typeof tab) => {
@@ -373,134 +360,145 @@ function App() {
   );
 
   const renderSettings = () => (
-    <div className="settings">
-      <div className="settings-header">
-        <h2><i className="fas fa-palette"></i> Personnalisez votre expérience</h2>
-        <p className="settings-subtitle">Adaptez l'interface à vos goûts et préférences</p>
-        <button className="btn-primary">
-          <i className="fas fa-save"></i> Enregistrer mes préférences
-        </button>
+    <div className="modern-settings">
+      <div className="settings-hero">
+        <div className="settings-hero-content">
+          <div className="settings-hero-icon">
+            <i className="fas fa-cog"></i>
+          </div>
+          <h1>Centre de contrôle</h1>
+          <p>Personnalisez votre expérience Discord Panel selon vos préférences</p>
+        </div>
       </div>
-      <div className="settings-sections">
-        <div className="settings-section">
-          <h3><i className="fas fa-paint-brush"></i> Apparence et style</h3>
-          <p className="section-description">Créez l'ambiance qui vous correspond</p>
-          <div className="settings-grid">
-            <div className="setting-item">
-              <div className="setting-info">
-                <label className="setting-label">
-                  <i className="fas fa-moon"></i> Mode sombre
-                </label>
-                <p className="setting-description">Protégez vos yeux avec un thème plus doux</p>
-              </div>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={settings.darkMode}
-                  onChange={(e) => handleSettingChange('darkMode', e.target.checked)}
-                />
-                <span className="slider"></span>
-              </label>
+
+      <div className="settings-container">
+        <div className="settings-sidebar">
+          <nav className="settings-nav">
+            <div className="nav-item active">
+              <i className="fas fa-paint-brush"></i>
+              <span>Interface</span>
             </div>
-            <div className="setting-item">
-              <div className="setting-info">
-                <label className="setting-label">
-                  <i className="fas fa-palette"></i> Couleur d'accent
-                </label>
-                <p className="setting-description">Choisissez la couleur qui vous inspire</p>
-              </div>
-              <select
-                className="setting-select"
-                value={settings.theme}
-                onChange={(e) => handleSettingChange('theme', e.target.value)}
-              >
-                <option value="blue">💙 Bleu océan</option>
-                <option value="purple">💜 Violet mystique</option>
-                <option value="green">💚 Vert nature</option>
-                <option value="orange">🧡 Orange énergique</option>
-              </select>
+            <div className="nav-item">
+              <i className="fas fa-bell"></i>
+              <span>Notifications</span>
             </div>
-          </div>
+            <div className="nav-item">
+              <i className="fas fa-shield-alt"></i>
+              <span>Sécurité</span>
+            </div>
+            <div className="nav-item">
+              <i className="fas fa-rocket"></i>
+              <span>Performance</span>
+            </div>
+          </nav>
         </div>
-        <div className="settings-section">
-          <h3><i className="fas fa-globe"></i> Langue et région</h3>
-          <p className="section-description">Utilisez l'interface dans votre langue préférée</p>
-          <div className="settings-grid">
-            <div className="setting-item">
-              <div className="setting-info">
-                <label className="setting-label">
-                  <i className="fas fa-language"></i> Langue d'affichage
-                </label>
-                <p className="setting-description">Changez la langue de l'interface</p>
-              </div>
-              <select
-                className="setting-select"
-                value={settings.language}
-                onChange={(e) => handleSettingChange('language', e.target.value)}
-              >
-                <option value="fr">🇫🇷 Français</option>
-                <option value="en">🇺🇸 English</option>
-              </select>
+
+        <div className="settings-content">
+          <div className="setting-group active">
+            <div className="group-header">
+              <h2>Personnalisation de l'interface</h2>
+              <p>Adaptez l'apparence à votre style</p>
             </div>
-          </div>
-        </div>
-        <div className="settings-section">
-          <h3><i className="fas fa-bell"></i> Notifications et alertes</h3>
-          <p className="section-description">Restez informé sans être dérangé</p>
-          <div className="settings-grid">
-            <div className="setting-item">
-              <div className="setting-info">
-                <label className="setting-label">
-                  <i className="fas fa-bell"></i> Notifications push
-                </label>
-                <p className="setting-description">Recevez des alertes importantes</p>
+            
+            <div className="setting-cards">
+              <div className="setting-card">
+                <div className="setting-card-header">
+                  <div className="setting-icon">
+                    <i className="fas fa-language"></i>
+                  </div>
+                  <div className="setting-title">
+                    <h3>Langue d'affichage</h3>
+                    <p>Choisissez votre langue préférée</p>
+                  </div>
+                </div>
+                <div className="setting-control">
+                  <select
+                    className="modern-select"
+                    value={settings.language}
+                    onChange={(e) => handleSettingChange('language', e.target.value)}
+                  >
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="en">🇺🇸 English</option>
+                  </select>
+                </div>
               </div>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={settings.notifications}
-                  onChange={(e) => handleSettingChange('notifications', e.target.checked)}
-                />
-                <span className="slider"></span>
-              </label>
+
+              <div className="setting-card">
+                <div className="setting-card-header">
+                  <div className="setting-icon">
+                    <i className="fas fa-bell"></i>
+                  </div>
+                  <div className="setting-title">
+                    <h3>Notifications push</h3>
+                    <p>Restez informé des événements importants</p>
+                  </div>
+                </div>
+                <div className="setting-control">
+                  <label className="modern-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.notifications}
+                      onChange={(e) => handleSettingChange('notifications', e.target.checked)}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="setting-card">
+                <div className="setting-card-header">
+                  <div className="setting-icon">
+                    <i className="fas fa-save"></i>
+                  </div>
+                  <div className="setting-title">
+                    <h3>Sauvegarde automatique</h3>
+                    <p>Enregistrement automatique des modifications</p>
+                  </div>
+                </div>
+                <div className="setting-control">
+                  <label className="modern-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.autoSave}
+                      onChange={(e) => handleSettingChange('autoSave', e.target.checked)}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="setting-card">
+                <div className="setting-card-header">
+                  <div className="setting-icon">
+                    <i className="fas fa-tachometer-alt"></i>
+                  </div>
+                  <div className="setting-title">
+                    <h3>Mode performance</h3>
+                    <p>Optimise l'interface pour les appareils moins puissants</p>
+                  </div>
+                </div>
+                <div className="setting-control">
+                  <label className="modern-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.performanceMode}
+                      onChange={(e) => handleSettingChange('performanceMode', e.target.checked)}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
             </div>
-            <div className="setting-item">
-              <div className="setting-info">
-                <label className="setting-label">
-                  <i className="fas fa-save"></i> Sauvegarde automatique
-                </label>
-                <p className="setting-description">Vos modifications sont sauvées automatiquement</p>
-              </div>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={settings.autoSave}
-                  onChange={(e) => handleSettingChange('autoSave', e.target.checked)}
-                />
-                <span className="slider"></span>
-              </label>
-            </div>
-          </div>
-        </div>
-        <div className="settings-section">
-          <h3><i className="fas fa-rocket"></i> Performance et fluidité</h3>
-          <p className="section-description">Optimisez l'interface selon votre appareil</p>
-          <div className="settings-grid">
-            <div className="setting-item">
-              <div className="setting-info">
-                <label className="setting-label">
-                  <i className="fas fa-tachometer-alt"></i> Mode performance
-                </label>
-                <p className="setting-description">Désactive les animations pour une interface plus rapide</p>
-              </div>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={settings.performanceMode}
-                  onChange={(e) => handleSettingChange('performanceMode', e.target.checked)}
-                />
-                <span className="slider"></span>
-              </label>
+
+            <div className="settings-actions">
+              <button className="action-btn primary">
+                <i className="fas fa-save"></i>
+                Enregistrer les modifications
+              </button>
+              <button className="action-btn secondary">
+                <i className="fas fa-undo"></i>
+                Restaurer par défaut
+              </button>
             </div>
           </div>
         </div>
@@ -764,13 +762,6 @@ function App() {
           </span>
         </div>
         <div className="nav-user">
-          <button 
-            className="dark-mode-toggle"
-            onClick={() => handleSettingChange('darkMode', !settings.darkMode)}
-            title={settings.darkMode ? "Passer en mode clair" : "Passer en mode sombre"}
-          >
-            <i className={settings.darkMode ? "fas fa-sun" : "fas fa-moon"}></i>
-          </button>
           <div className="user-menu" onClick={() => setShowUserDropdown(!showUserDropdown)}>
             <div className="user-avatar" title="Cliquer pour changer l'avatar">
               {userProfile.avatar ? (
@@ -820,10 +811,7 @@ function App() {
       <main className="content-wrapper">
         {tab === 'dashboard' && renderDashboard()}
         {tab === 'form' && <FormTab />}
-        {tab === 'aidobot' && <RevolutionaryAidoBotPanel 
-          performanceMode={settings.performanceMode}
-          onSettingChange={handleSettingChange}
-        />}
+        {tab === 'aidobot' && <ModernAidoBotPanel />}
         {tab === 'analytics' && renderAnalytics()}
         {tab === 'community' && renderCommunity()}
         {tab === 'settings' && renderSettings()}
