@@ -1,29 +1,8 @@
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import './App.css';
 import FormTab from './FormTab';
 import { RevolutionaryAidoBotPanel } from './RevolutionaryAidoBotPanel';
-
-interface Particle {
-  id: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  size: number;
-  color: string;
-  opacity: number;
-}
-
-interface FloatingShape {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  rotation: number;
-  speed: number;
-  type: 'circle' | 'square' | 'triangle';
-}
 
 interface UserSettings {
   darkMode: boolean;
@@ -45,10 +24,6 @@ interface UserProfile {
 
 function App() {
   const [tab, setTab] = useState<'dashboard' | 'form' | 'analytics' | 'settings' | 'community' | 'profile' | 'aidobot'>('dashboard');
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const [floatingShapes, setFloatingShapes] = useState<FloatingShape[]>([]);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [settings, setSettings] = useState<UserSettings>({
     darkMode: false,
     language: 'fr',
@@ -66,122 +41,52 @@ function App() {
     permissions: ['ADMINISTRATOR', 'MANAGE_GUILD', 'MANAGE_CHANNELS', 'MANAGE_ROLES']
   });
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>(0);
 
-  // Optimisation des performances avec useCallback pour éviter les re-renders
+  // Fonction pour changer l'avatar
+  const handleAvatarChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUserProfile(prev => ({
+          ...prev,
+          avatar: e.target?.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
+  // Applique le mode sombre
+  useEffect(() => {
+    if (settings.darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+    
+    // Applique le thème de couleur
+    document.documentElement.setAttribute('data-theme', settings.theme);
+    
+    // Applique le mode performance
+    if (settings.performanceMode) {
+      document.body.classList.add('performance-mode');
+    } else {
+      document.body.classList.remove('performance-mode');
+    }
+  }, [settings.darkMode, settings.theme, settings.performanceMode]);
+
+  // Fonctions simplifiées
   const handleTabChange = useCallback((newTab: typeof tab) => {
     setTab(newTab);
     setShowUserDropdown(false);
   }, []);
 
-  const handleSettingChange = useCallback((setting: keyof UserSettings, value: boolean | string) => {
+  const handleSettingChange = useCallback((setting: string, value: boolean | string) => {
     setSettings(prev => ({
       ...prev,
       [setting]: value
     }));
-  }, []);
-
-  // Animation optimisée 60/144 FPS
-  const animate = useCallback(() => {
-    if (canvasRef.current && !settings.performanceMode) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach(particle => {
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = particle.color;
-        ctx.globalAlpha = particle.opacity;
-        ctx.fill();
-      });
-
-      setParticles(prev => prev.map(particle => {
-        const newX = particle.x + particle.vx;
-        const newY = particle.y + particle.vy;
-        return {
-          ...particle,
-          x: newX > window.innerWidth ? 0 : newX < 0 ? window.innerWidth : newX,
-          y: newY > window.innerHeight ? 0 : newY < 0 ? window.innerHeight : newY
-        };
-      }));
-    }
-
-    animationRef.current = requestAnimationFrame(animate);
-  }, [particles, settings.performanceMode]);
-
-  // Optimisation des particules
-  const optimizedParticles = useMemo(() => {
-    if (settings.performanceMode) return [];
-    
-    return Array.from({ length: 30 }, (_, i) => ({
-      id: i,
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      vx: (Math.random() - 0.5) * 0.2,
-      vy: (Math.random() - 0.5) * 0.2,
-      size: Math.random() * 2 + 1,
-      color: `hsl(${200 + Math.random() * 60}, 70%, 60%)`,
-      opacity: Math.random() * 0.4 + 0.2
-    }));
-  }, [settings.performanceMode]);
-
-  useEffect(() => {
-    setParticles(optimizedParticles);
-  }, [optimizedParticles]);
-
-  useEffect(() => {
-    if (!settings.performanceMode) {
-      animationRef.current = requestAnimationFrame(animate);
-      return () => {
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-        }
-      };
-    }
-  }, [animate, settings.performanceMode]);
-
-  useEffect(() => {
-    // Génération des formes flottantes
-    const newShapes: FloatingShape[] = Array.from({ length: 15 }, (_, i) => ({
-      id: i,
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      size: Math.random() * 60 + 20,
-      rotation: Math.random() * 360,
-      speed: Math.random() * 0.5 + 0.1,
-      type: ['circle', 'square', 'triangle'][Math.floor(Math.random() * 3)] as 'circle' | 'square' | 'triangle'
-    }));
-    setFloatingShapes(newShapes);
-
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-
-    // Animation des particules
-    const animateParticles = () => {
-      setParticles(prev => prev.map(particle => ({
-        ...particle,
-        x: particle.x + particle.vx,
-        y: particle.y + particle.vy,
-        vx: particle.x > window.innerWidth || particle.x < 0 ? -particle.vx : particle.vx,
-        vy: particle.y > window.innerHeight || particle.y < 0 ? -particle.vy : particle.vy
-      })));
-    };
-
-    const particleInterval = setInterval(animateParticles, 16);
-    const timeInterval = setInterval(() => setCurrentTime(new Date()), 1000);
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      clearInterval(particleInterval);
-      clearInterval(timeInterval);
-    };
   }, []);
 
   const renderDashboard = () => (
@@ -189,119 +94,83 @@ function App() {
       <div className="hero-section">
         <div className="hero-content">
           <div className="hero-badge">
-            <i className="fas fa-sparkles"></i> Nouvelle Génération
+            <i className="fas fa-sparkles"></i> Découvrez la Magie
           </div>
-          <h1 className="hero-title">AidoBot Panel Revolution</h1>
-          <p className="hero-subtitle">L'expérience ultime de gestion AidoBot avec des animations et effets révolutionnaires</p>
+          <h1 className="hero-title">Bienvenue dans l'univers AidoBot</h1>
+          <p className="hero-subtitle">Votre compagnon Discord ultime vous attend ! Gérez votre serveur comme un pro avec des outils pensés pour vous simplifier la vie.</p>
           <div className="hero-buttons">
             <button className="btn-primary" onClick={() => handleTabChange('form')}>
-              <i className="fas fa-play"></i>
-              <span>Commencer</span>
+              <i className="fas fa-rocket"></i>
+              <span>C'est parti !</span>
             </button>
             <button className="btn-secondary" onClick={() => handleTabChange('analytics')}>
               <i className="fas fa-chart-line"></i>
-              <span>Explorer</span>
+              <span>Voir les stats</span>
             </button>
-          </div>
-        </div>
-        <div className="hero-visual">
-          <div className="floating-card">
-            <div className="time-display">
-              <div className="time">{currentTime.toLocaleTimeString()}</div>
-              <div className="date">{currentTime.toLocaleDateString()}</div>
-            </div>
           </div>
         </div>
       </div>
 
       <div className="stats-section">
         <div className="stat-card">
-          <div className="stat-header">
-            <i className="fas fa-user"></i>
-            <span>Utilisateur</span>
+          <div className="stat-icon">
+            <i className="fas fa-user-friends"></i>
           </div>
           <div className="stat-content">
-            <h3>1</h3>
-            <p>Utilisateur actif</p>
-          </div>
-          <div className="stat-trend">
-            <i className="fas fa-check-circle text-green"></i> Connecté
+            <h3>Connecté</h3>
+            <p>Vous êtes en ligne</p>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-header">
-            <i className="fas fa-rocket"></i>
-            <span>Performance</span>
+          <div className="stat-icon">
+            <i className="fas fa-heart"></i>
           </div>
           <div className="stat-content">
-            <h3>100%</h3>
-            <p>Fonctionnalités</p>
-          </div>
-          <div className="stat-trend">
-            <i className="fas fa-check-circle text-green"></i> Opérationnel
+            <h3>Parfait</h3>
+            <p>Tout fonctionne</p>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-header">
-            <i className="fas fa-bolt"></i>
-            <span>Vitesse</span>
+          <div className="stat-icon">
+            <i className="fas fa-zap"></i>
           </div>
           <div className="stat-content">
-            <h3>0.1s</h3>
-            <p>Temps de réponse</p>
-          </div>
-          <div className="stat-trend">
-            <i className="fas fa-trending-up text-green"></i> Optimisé
+            <h3>Rapide</h3>
+            <p>Interface fluide</p>
           </div>
         </div>
       </div>
       
       <div className="features-section">
-        <h2 className="section-title">Fonctionnalités Avancées</h2>
+        <h2 className="section-title">Ce que vous allez adorer</h2>
         <div className="feature-grid">
           <div className="feature-card" onClick={() => handleTabChange('form')}>
-            <div className="feature-header">
-              <i className="fas fa-clipboard-list"></i>
-              <h3>Formulaires Intelligents</h3>
+            <div className="feature-icon">
+              <i className="fas fa-magic"></i>
             </div>
-            <p>Créez des formulaires avec IA intégrée et validation en temps réel</p>
-            <div className="feature-tech">
-              <span>AI</span>
-              <span>Real-time</span>
-            </div>
+            <h3>Formulaires Magiques</h3>
+            <p>Créez des formulaires intelligents qui s'adaptent à vos besoins. Plus besoin de coder !</p>
           </div>
           <div className="feature-card" onClick={() => handleTabChange('analytics')}>
-            <div className="feature-header">
-              <i className="fas fa-chart-pie"></i>
-              <h3>Analytics Prédictifs</h3>
+            <div className="feature-icon">
+              <i className="fas fa-chart-line"></i>
             </div>
-            <p>Analysez vos données avec des prédictions basées sur l'IA</p>
-            <div className="feature-tech">
-              <span>ML</span>
-              <span>Insights</span>
-            </div>
+            <h3>Statistiques Vivantes</h3>
+            <p>Suivez l'activité de votre serveur en temps réel. Des graphiques qui vous parlent vraiment.</p>
           </div>
           <div className="feature-card" onClick={() => handleTabChange('community')}>
-            <div className="feature-header">
+            <div className="feature-icon">
               <i className="fas fa-users"></i>
-              <h3>Communauté</h3>
             </div>
-            <p>Connectez-vous avec d'autres utilisateurs et partagez vos créations</p>
-            <div className="feature-tech">
-              <span>Social</span>
-              <span>Share</span>
-            </div>
+            <h3>Communauté Chaleureuse</h3>
+            <p>Rejoignez des milliers d'utilisateurs passionnés. Partagez vos créations et inspirez-vous.</p>
           </div>
           <div className="feature-card" onClick={() => handleTabChange('settings')}>
-            <div className="feature-header">
-              <i className="fas fa-sliders-h"></i>
-              <h3>Paramètres Avancés</h3>
+            <div className="feature-icon">
+              <i className="fas fa-palette"></i>
             </div>
-            <p>Personnalisez chaque aspect de votre expérience</p>
-            <div className="feature-tech">
-              <span>Custom</span>
-              <span>Advanced</span>
-            </div>
+            <h3>Personnalisation Totale</h3>
+            <p>Adaptez l'interface à votre style. Couleurs, thèmes, raccourcis... tout est possible !</p>
           </div>
         </div>
       </div>
@@ -311,62 +180,109 @@ function App() {
   const renderAnalytics = () => (
     <div className="analytics">
       <div className="analytics-header">
-        <h2><i className="fas fa-chart-line"></i> Analytics Dashboard</h2>
+        <h2><i className="fas fa-chart-line"></i> Tableau de bord des statistiques</h2>
+        <p className="analytics-subtitle">Découvrez comment votre serveur performe jour après jour</p>
         <div className="analytics-filters">
           <button className="filter-btn active">Aujourd'hui</button>
-          <button className="filter-btn">7 jours</button>
-          <button className="filter-btn">30 jours</button>
+          <button className="filter-btn">Cette semaine</button>
+          <button className="filter-btn">Ce mois</button>
         </div>
       </div>
       <div className="chart-container">
         <div className="chart-card">
-          <h3><i className="fas fa-users"></i> Activité Utilisateurs</h3>
-          <div className="chart-bar">
-            <div className="bar" style={{height: '70%'}} data-value="70"></div>
-            <div className="bar" style={{height: '45%'}} data-value="45"></div>
-            <div className="bar" style={{height: '80%'}} data-value="80"></div>
-            <div className="bar" style={{height: '60%'}} data-value="60"></div>
-            <div className="bar" style={{height: '90%'}} data-value="90"></div>
-            <div className="bar" style={{height: '75%'}} data-value="75"></div>
+          <div className="chart-header">
+            <h3><i className="fas fa-users"></i> Activité de votre communauté</h3>
+            <p>Nombre de personnes actives</p>
           </div>
-          <div className="chart-labels">
-            <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span>
+          <div className="chart-bar">
+            <div className="bar" style={{height: '70%'}} data-value="70">
+              <span className="bar-label">Lun</span>
+              <span className="bar-value">70</span>
+            </div>
+            <div className="bar" style={{height: '45%'}} data-value="45">
+              <span className="bar-label">Mar</span>
+              <span className="bar-value">45</span>
+            </div>
+            <div className="bar" style={{height: '80%'}} data-value="80">
+              <span className="bar-label">Mer</span>
+              <span className="bar-value">80</span>
+            </div>
+            <div className="bar" style={{height: '60%'}} data-value="60">
+              <span className="bar-label">Jeu</span>
+              <span className="bar-value">60</span>
+            </div>
+            <div className="bar" style={{height: '90%'}} data-value="90">
+              <span className="bar-label">Ven</span>
+              <span className="bar-value">90</span>
+            </div>
+            <div className="bar" style={{height: '75%'}} data-value="75">
+              <span className="bar-label">Sam</span>
+              <span className="bar-value">75</span>
+            </div>
           </div>
         </div>
         <div className="chart-card">
-          <h3><i className="fas fa-tachometer-alt"></i> Performance Globale</h3>
+          <div className="chart-header">
+            <h3><i className="fas fa-heart"></i> Satisfaction générale</h3>
+            <p>Votre serveur fait plaisir !</p>
+          </div>
           <div className="performance-circle">
             <div className="circle-progress">
               <div className="circle-fill" style={{transform: 'rotate(295deg)'}}></div>
               <div className="circle-inner">
                 <span className="perf-value">92%</span>
-                <span className="perf-label">Excellent</span>
+                <span className="perf-label">Fantastique</span>
               </div>
             </div>
           </div>
         </div>
         <div className="chart-card live-metrics">
-          <h3><i className="fas fa-heartbeat"></i> Métriques Live</h3>
-          <div className="metric-item">
-            <span className="metric-label">CPU</span>
-            <div className="metric-bar">
-              <div className="metric-fill" style={{width: '45%'}}></div>
-            </div>
-            <span className="metric-value">45%</span>
+          <div className="chart-header">
+            <h3><i className="fas fa-activity"></i> État en temps réel</h3>
+            <p>Tout roule parfaitement</p>
           </div>
           <div className="metric-item">
-            <span className="metric-label">RAM</span>
-            <div className="metric-bar">
-              <div className="metric-fill" style={{width: '62%'}}></div>
+            <div className="metric-info">
+              <span className="metric-label">🖥️ Serveur</span>
+              <span className="metric-status">Excellent</span>
             </div>
-            <span className="metric-value">62%</span>
+            <div className="metric-bar">
+              <div className="metric-fill" style={{width: '25%', backgroundColor: '#10b981'}}></div>
+            </div>
+            <span className="metric-value">25%</span>
           </div>
           <div className="metric-item">
-            <span className="metric-label">Réseau</span>
-            <div className="metric-bar">
-              <div className="metric-fill" style={{width: '28%'}}></div>
+            <div className="metric-info">
+              <span className="metric-label">💾 Mémoire</span>
+              <span className="metric-status">Fluide</span>
             </div>
-            <span className="metric-value">28%</span>
+            <div className="metric-bar">
+              <div className="metric-fill" style={{width: '42%', backgroundColor: '#3b82f6'}}></div>
+            </div>
+            <span className="metric-value">42%</span>
+          </div>
+          <div className="metric-item">
+            <div className="metric-info">
+              <span className="metric-label">🌐 Connexion</span>
+              <span className="metric-status">Rapide</span>
+            </div>
+            <div className="metric-bar">
+              <div className="metric-fill" style={{width: '18%', backgroundColor: '#06b6d4'}}></div>
+            </div>
+            <span className="metric-value">18%</span>
+          </div>
+        </div>
+      </div>
+      <div className="insights-section">
+        <h3>💡 Conseils personnalisés</h3>
+        <div className="insights-grid">
+          <div className="insight-card">
+            <i className="fas fa-trending-up"></i>
+            <p>Votre serveur est plus actif le vendredi ! Pensez à organiser des événements ce jour-là.</p>
+          </div>
+          <div className="insight-card">
+            <i className="fas fa-users"></i>
+            <p>Les nouveaux membres rejoignent principalement le soir. Un message de bienvenue automatique serait parfait.</p>
           </div>
         </div>
       </div>
@@ -376,41 +292,81 @@ function App() {
   const renderCommunity = () => (
     <div className="community">
       <div className="community-header">
-        <h2><i className="fas fa-users"></i> Communauté AidoBot</h2>
+        <h2><i className="fas fa-heart"></i> Notre belle communauté</h2>
+        <p className="community-subtitle">Rejoignez des milliers de passionnés comme vous !</p>
         <button className="btn-primary">
-          <i className="fas fa-plus"></i> Rejoindre
+          <i className="fas fa-users"></i> Nous rejoindre
         </button>
+      </div>
+      <div className="community-stats">
+        <div className="stat-bubble">
+          <span className="stat-number">12,567</span>
+          <span className="stat-label">Membres actifs</span>
+        </div>
+        <div className="stat-bubble">
+          <span className="stat-number">2,341</span>
+          <span className="stat-label">Serveurs connectés</span>
+        </div>
+        <div className="stat-bubble">
+          <span className="stat-number">98%</span>
+          <span className="stat-label">Satisfaction</span>
+        </div>
       </div>
       <div className="community-grid">
         <div className="community-card">
+          <div className="card-bg"></div>
           <div className="user-avatar">
             <i className="fas fa-code"></i>
           </div>
-          <h3>Développeurs</h3>
-          <p>Rejoignez notre communauté de développeurs passionnés</p>
-          <button className="join-btn">
-            <i className="fas fa-sign-in-alt"></i> Rejoindre
-          </button>
-        </div>
-        <div className="community-card">
-          <div className="user-avatar">
-            <i className="fas fa-palette"></i>
+          <h3>Développeurs créatifs</h3>
+          <p>Créez des bots incroyables et partagez vos astuces avec des développeurs passionnés du monde entier.</p>
+          <div className="member-count">
+            <i className="fas fa-users"></i> 3,245 membres
           </div>
-          <h3>Designers</h3>
-          <p>Partagez vos créations avec des designers talentueux</p>
           <button className="join-btn">
-            <i className="fas fa-sign-in-alt"></i> Rejoindre
+            <i className="fas fa-plus"></i> Rejoindre
           </button>
         </div>
         <div className="community-card">
+          <div className="card-bg"></div>
+          <div className="user-avatar">
+            <i className="fas fa-paint-brush"></i>
+          </div>
+          <h3>Designers talentueux</h3>
+          <p>Partagez vos plus belles créations graphiques et inspirez-vous des œuvres d'artistes du digital.</p>
+          <div className="member-count">
+            <i className="fas fa-users"></i> 1,892 membres
+          </div>
+          <button className="join-btn">
+            <i className="fas fa-plus"></i> Rejoindre
+          </button>
+        </div>
+        <div className="community-card">
+          <div className="card-bg"></div>
           <div className="user-avatar">
             <i className="fas fa-gamepad"></i>
           </div>
-          <h3>Gamers</h3>
-          <p>Connectez-vous avec des gamers du monde entier</p>
+          <h3>Gamers passionnés</h3>
+          <p>Organisez des tournois épiques et connectez-vous avec des joueurs qui partagent votre passion.</p>
+          <div className="member-count">
+            <i className="fas fa-users"></i> 7,430 membres
+          </div>
           <button className="join-btn">
-            <i className="fas fa-sign-in-alt"></i> Rejoindre
+            <i className="fas fa-plus"></i> Rejoindre
           </button>
+        </div>
+      </div>
+      <div className="community-testimonials">
+        <h3>💬 Ce qu'ils en pensent</h3>
+        <div className="testimonials-grid">
+          <div className="testimonial">
+            <p>"Cette communauté a transformé ma façon de créer des bots. L'entraide est incroyable !"</p>
+            <span>- Sarah, développeuse</span>
+          </div>
+          <div className="testimonial">
+            <p>"J'ai trouvé l'inspiration pour mes designs ici. Les feedbacks sont toujours constructifs."</p>
+            <span>- Marc, designer</span>
+          </div>
         </div>
       </div>
     </div>
@@ -419,19 +375,24 @@ function App() {
   const renderSettings = () => (
     <div className="settings">
       <div className="settings-header">
-        <h2><i className="fas fa-cog"></i> Paramètres Avancés</h2>
+        <h2><i className="fas fa-palette"></i> Personnalisez votre expérience</h2>
+        <p className="settings-subtitle">Adaptez l'interface à vos goûts et préférences</p>
         <button className="btn-primary">
-          <i className="fas fa-save"></i> Sauvegarder
+          <i className="fas fa-save"></i> Enregistrer mes préférences
         </button>
       </div>
       <div className="settings-sections">
         <div className="settings-section">
-          <h3><i className="fas fa-palette"></i> Apparence</h3>
+          <h3><i className="fas fa-paint-brush"></i> Apparence et style</h3>
+          <p className="section-description">Créez l'ambiance qui vous correspond</p>
           <div className="settings-grid">
             <div className="setting-item">
-              <label className="setting-label">
-                <i className="fas fa-moon"></i> Mode sombre
-              </label>
+              <div className="setting-info">
+                <label className="setting-label">
+                  <i className="fas fa-moon"></i> Mode sombre
+                </label>
+                <p className="setting-description">Protégez vos yeux avec un thème plus doux</p>
+              </div>
               <label className="switch">
                 <input
                   type="checkbox"
@@ -442,47 +403,58 @@ function App() {
               </label>
             </div>
             <div className="setting-item">
-              <label className="setting-label">
-                <i className="fas fa-paint-brush"></i> Thème
-              </label>
+              <div className="setting-info">
+                <label className="setting-label">
+                  <i className="fas fa-palette"></i> Couleur d'accent
+                </label>
+                <p className="setting-description">Choisissez la couleur qui vous inspire</p>
+              </div>
               <select
                 className="setting-select"
                 value={settings.theme}
                 onChange={(e) => handleSettingChange('theme', e.target.value)}
               >
-                <option value="blue">Bleu</option>
-                <option value="purple">Violet</option>
-                <option value="green">Vert</option>
-                <option value="orange">Orange</option>
+                <option value="blue">💙 Bleu océan</option>
+                <option value="purple">💜 Violet mystique</option>
+                <option value="green">💚 Vert nature</option>
+                <option value="orange">🧡 Orange énergique</option>
               </select>
             </div>
           </div>
         </div>
         <div className="settings-section">
-          <h3><i className="fas fa-language"></i> Langue et Région</h3>
+          <h3><i className="fas fa-globe"></i> Langue et région</h3>
+          <p className="section-description">Utilisez l'interface dans votre langue préférée</p>
           <div className="settings-grid">
             <div className="setting-item">
-              <label className="setting-label">
-                <i className="fas fa-globe"></i> Langue
-              </label>
+              <div className="setting-info">
+                <label className="setting-label">
+                  <i className="fas fa-language"></i> Langue d'affichage
+                </label>
+                <p className="setting-description">Changez la langue de l'interface</p>
+              </div>
               <select
                 className="setting-select"
                 value={settings.language}
                 onChange={(e) => handleSettingChange('language', e.target.value)}
               >
-                <option value="fr">Français</option>
-                <option value="en">English</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="en">🇺🇸 English</option>
               </select>
             </div>
           </div>
         </div>
         <div className="settings-section">
-          <h3><i className="fas fa-bell"></i> Notifications</h3>
+          <h3><i className="fas fa-bell"></i> Notifications et alertes</h3>
+          <p className="section-description">Restez informé sans être dérangé</p>
           <div className="settings-grid">
             <div className="setting-item">
-              <label className="setting-label">
-                <i className="fas fa-bell"></i> Notifications push
-              </label>
+              <div className="setting-info">
+                <label className="setting-label">
+                  <i className="fas fa-bell"></i> Notifications push
+                </label>
+                <p className="setting-description">Recevez des alertes importantes</p>
+              </div>
               <label className="switch">
                 <input
                   type="checkbox"
@@ -493,9 +465,12 @@ function App() {
               </label>
             </div>
             <div className="setting-item">
-              <label className="setting-label">
-                <i className="fas fa-save"></i> Sauvegarde auto
-              </label>
+              <div className="setting-info">
+                <label className="setting-label">
+                  <i className="fas fa-save"></i> Sauvegarde automatique
+                </label>
+                <p className="setting-description">Vos modifications sont sauvées automatiquement</p>
+              </div>
               <label className="switch">
                 <input
                   type="checkbox"
@@ -508,12 +483,16 @@ function App() {
           </div>
         </div>
         <div className="settings-section">
-          <h3><i className="fas fa-tachometer-alt"></i> Performance</h3>
+          <h3><i className="fas fa-rocket"></i> Performance et fluidité</h3>
+          <p className="section-description">Optimisez l'interface selon votre appareil</p>
           <div className="settings-grid">
             <div className="setting-item">
-              <label className="setting-label">
-                <i className="fas fa-rocket"></i> Mode performance
-              </label>
+              <div className="setting-info">
+                <label className="setting-label">
+                  <i className="fas fa-tachometer-alt"></i> Mode performance
+                </label>
+                <p className="setting-description">Désactive les animations pour une interface plus rapide</p>
+              </div>
               <label className="switch">
                 <input
                   type="checkbox"
@@ -532,60 +511,211 @@ function App() {
   const renderProfile = () => (
     <div className="profile">
       <div className="profile-header">
-        <div className="profile-avatar">
-          <i className="fas fa-user-crown"></i>
+        <div className="profile-avatar-container">
+          <div className="profile-avatar">
+            {userProfile.avatar ? (
+              <img src={userProfile.avatar} alt="Avatar" className="avatar-image" />
+            ) : (
+              <i className="fas fa-user-crown"></i>
+            )}
+            <div className="avatar-ring"></div>
+          </div>
+          <label className="avatar-upload-btn" htmlFor="avatar-upload">
+            <i className="fas fa-camera"></i>
+            <span>Changer la photo</span>
+          </label>
+          <input
+            type="file"
+            id="avatar-upload"
+            accept="image/*"
+            onChange={handleAvatarChange}
+            style={{ display: 'none' }}
+          />
         </div>
         <div className="profile-info">
-          <h2>{userProfile.name}</h2>
+          <h2>Salut {userProfile.name} ! 👋</h2>
           <p className="profile-role">
             <i className="fas fa-shield-alt"></i> {userProfile.role}
           </p>
+          <div className="profile-badges">
+            <span className="badge premium">🏆 Membre VIP</span>
+            <span className="badge active">⭐ Actif</span>
+            <span className="badge verified">✅ Vérifié</span>
+          </div>
+          <div className="profile-stats">
+            <div className="stat-item">
+              <span className="stat-value">2,456</span>
+              <span className="stat-label">Messages</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-value">128</span>
+              <span className="stat-label">Jours actifs</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-value">95%</span>
+              <span className="stat-label">Satisfaction</span>
+            </div>
+          </div>
         </div>
       </div>
       
       <div className="profile-sections">
         <div className="profile-section">
-          <h3><i className="fas fa-info-circle"></i> Informations</h3>
-          <div className="profile-grid">
-            <div className="profile-item">
-              <label><i className="fas fa-envelope"></i> Email</label>
-              <input
-                type="email"
-                value={userProfile.email}
-                onChange={(e) => setUserProfile(prev => ({ ...prev, email: e.target.value }))}
-                className="profile-input"
-              />
+          <div className="section-header">
+            <h3><i className="fas fa-user-edit"></i> Informations personnelles</h3>
+            <p className="section-description">Gérez vos informations de profil et préférences</p>
+          </div>
+          <div className="profile-form">
+            <div className="form-row">
+              <div className="form-group">
+                <label><i className="fas fa-user"></i> Nom d'utilisateur</label>
+                <input
+                  type="text"
+                  value={userProfile.name}
+                  onChange={(e) => setUserProfile(prev => ({ ...prev, name: e.target.value }))}
+                  className="profile-input"
+                  placeholder="Votre nom d'utilisateur"
+                />
+              </div>
+              <div className="form-group">
+                <label><i className="fas fa-envelope"></i> Adresse email</label>
+                <input
+                  type="email"
+                  value={userProfile.email}
+                  onChange={(e) => setUserProfile(prev => ({ ...prev, email: e.target.value }))}
+                  className="profile-input"
+                  placeholder="votre.email@exemple.com"
+                />
+              </div>
             </div>
-            <div className="profile-item">
-              <label><i className="fas fa-calendar"></i> Membre depuis</label>
-              <span className="profile-value">{new Date(userProfile.joinDate).toLocaleDateString()}</span>
+            <div className="form-row">
+              <div className="form-group">
+                <label><i className="fas fa-shield-alt"></i> Rôle actuel</label>
+                <div className="profile-value role-display">
+                  <span className="role-badge">{userProfile.role}</span>
+                  <small>Rôle assigné automatiquement</small>
+                </div>
+              </div>
+              <div className="form-group">
+                <label><i className="fas fa-calendar-alt"></i> Membre depuis</label>
+                <div className="profile-value">
+                  <span>{new Date(userProfile.joinDate).toLocaleDateString('fr-FR', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}</span>
+                  <small>Il y a {Math.floor((Date.now() - new Date(userProfile.joinDate).getTime()) / (1000 * 60 * 60 * 24))} jours</small>
+                </div>
+              </div>
+            </div>
+            <div className="form-actions">
+              <button className="btn-primary">
+                <i className="fas fa-save"></i>
+                Sauvegarder les modifications
+              </button>
+              <button className="btn-secondary">
+                <i className="fas fa-undo"></i>
+                Annuler
+              </button>
             </div>
           </div>
         </div>
         
         <div className="profile-section">
-          <h3><i className="fas fa-key"></i> Permissions</h3>
+          <div className="section-header">
+            <h3><i className="fas fa-key"></i> Permissions et accès</h3>
+            <p className="section-description">Voici tout ce que vous pouvez faire sur votre serveur</p>
+          </div>
           <div className="permissions-grid">
             {userProfile.permissions.map((permission, index) => (
-              <div key={index} className="permission-item">
-                <i className="fas fa-check-circle"></i>
-                <span>{permission}</span>
+              <div key={index} className="permission-card">
+                <div className="permission-icon">
+                  <i className="fas fa-check-circle"></i>
+                </div>
+                <div className="permission-content">
+                  <h4>{permission.replace('_', ' ').toLowerCase()}</h4>
+                  <p className="permission-description">
+                    {permission === 'ADMINISTRATOR' && 'Accès total à toutes les fonctionnalités'}
+                    {permission === 'MANAGE_GUILD' && 'Gérer les paramètres du serveur'}
+                    {permission === 'MANAGE_CHANNELS' && 'Créer et modifier les salons'}
+                    {permission === 'MANAGE_ROLES' && 'Gérer les rôles des membres'}
+                  </p>
+                </div>
+                <div className="permission-status">
+                  <span className="status-active">Actif</span>
+                </div>
               </div>
             ))}
           </div>
         </div>
         
         <div className="profile-section">
-          <h3><i className="fas fa-shield-alt"></i> Sécurité</h3>
-          <div className="security-actions">
-            <button className="btn-secondary">
-              <i className="fas fa-key"></i> Changer mot de passe
-            </button>
-            <button className="btn-secondary">
-              <i className="fas fa-mobile-alt"></i> Authentification 2FA
+          <div className="section-header">
+            <h3><i className="fas fa-shield-check"></i> Sécurité et confidentialité</h3>
+            <p className="section-description">Protégez votre compte avec nos outils de sécurité avancés</p>
+          </div>
+          <div className="security-grid">
+            <div className="security-card">
+              <div className="security-icon">
+                <i className="fas fa-key"></i>
+              </div>
+              <div className="security-content">
+                <h4>Mot de passe</h4>
+                <p>Dernière modification il y a 3 mois</p>
+                <button className="btn-secondary">
+                  <i className="fas fa-edit"></i>
+                  Modifier
+                </button>
+              </div>
+            </div>
+            <div className="security-card">
+              <div className="security-icon">
+                <i className="fas fa-mobile-alt"></i>
+              </div>
+              <div className="security-content">
+                <h4>Authentification à deux facteurs</h4>
+                <p>Sécurisez votre compte en deux étapes</p>
+                <button className="btn-primary">
+                  <i className="fas fa-shield-check"></i>
+                  Activer
+                </button>
+              </div>
+            </div>
+            <div className="security-card">
+              <div className="security-icon">
+                <i className="fas fa-history"></i>
+              </div>
+              <div className="security-content">
+                <h4>Historique de connexion</h4>
+                <p>Consultez vos dernières connexions</p>
+                <button className="btn-secondary">
+                  <i className="fas fa-eye"></i>
+                  Voir l'historique
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="profile-section danger-zone">
+          <div className="section-header">
+            <h3><i className="fas fa-exclamation-triangle"></i> Zone de danger</h3>
+            <p className="section-description">Actions irréversibles - Procédez avec prudence</p>
+          </div>
+          <div className="danger-actions">
+            <button className="btn-danger">
+              <i className="fas fa-sign-out-alt"></i>
+              <div>
+                <span>Se déconnecter</span>
+                <small>Fermer cette session en toute sécurité</small>
+              </div>
             </button>
             <button className="btn-danger">
-              <i className="fas fa-sign-out-alt"></i> Déconnexion
+              <i className="fas fa-user-times"></i>
+              <div>
+                <span>Supprimer le compte</span>
+                <small>Cette action est définitive et irréversible</small>
+              </div>
             </button>
           </div>
         </div>
@@ -595,51 +725,6 @@ function App() {
 
   return (
     <div className="main-panel">
-      <div className="background-effects">
-        <div className="gradient-orb orb-1"></div>
-        <div className="gradient-orb orb-2"></div>
-        <div className="gradient-orb orb-3"></div>
-      </div>
-
-      <div className="particles-container">
-        {particles.map(particle => (
-          <div
-            key={particle.id}
-            className="particle"
-            style={{
-              left: particle.x,
-              top: particle.y,
-              width: particle.size,
-              height: particle.size,
-              backgroundColor: particle.color,
-              opacity: particle.opacity,
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="floating-shapes">
-        {floatingShapes.map(shape => (
-          <div
-            key={shape.id}
-            className={`floating-shape ${shape.type}`}
-            style={{
-              left: shape.x,
-              top: shape.y,
-              width: shape.size,
-              height: shape.size,
-              transform: `rotate(${shape.rotation}deg)`,
-              animationDuration: `${shape.speed * 20}s`
-            }}
-          />
-        ))}
-      </div>
-      
-      <div className="mouse-glow" style={{
-        left: mousePos.x - 150,
-        top: mousePos.y - 150
-      }}></div>
-
       <nav className="nav-bar">
         <div className="nav-logo">
           <div className="logo-container">
@@ -679,18 +764,41 @@ function App() {
           </span>
         </div>
         <div className="nav-user">
+          <button 
+            className="dark-mode-toggle"
+            onClick={() => handleSettingChange('darkMode', !settings.darkMode)}
+            title={settings.darkMode ? "Passer en mode clair" : "Passer en mode sombre"}
+          >
+            <i className={settings.darkMode ? "fas fa-sun" : "fas fa-moon"}></i>
+          </button>
           <div className="user-menu" onClick={() => setShowUserDropdown(!showUserDropdown)}>
-            <div className="user-avatar">
-              <i className="fas fa-user-crown"></i>
+            <div className="user-avatar" title="Cliquer pour changer l'avatar">
+              {userProfile.avatar ? (
+                <img src={userProfile.avatar} alt="Avatar" className="nav-avatar-image" />
+              ) : (
+                <i className="fas fa-user-crown"></i>
+              )}
             </div>
             <div className="user-info">
-              <span className="user-name">Admin</span>
-              <span className="user-role">Administrateur</span>
+              <span className="user-name">{userProfile.name}</span>
+              <span className="user-role">{userProfile.role}</span>
             </div>
             <i className="fas fa-chevron-down dropdown-arrow"></i>
           </div>
           {showUserDropdown && (
             <div className="user-dropdown">
+              <label className="dropdown-item avatar-change" htmlFor="nav-avatar-upload">
+                <i className="fas fa-camera"></i>
+                <span>Changer l'avatar</span>
+              </label>
+              <input
+                type="file"
+                id="nav-avatar-upload"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                style={{ display: 'none' }}
+              />
+              <div className="dropdown-divider"></div>
               <div className="dropdown-item" onClick={() => handleTabChange('profile')}>
                 <i className="fas fa-user"></i>
                 <span>Mon Profil</span>
@@ -709,34 +817,24 @@ function App() {
         </div>
       </nav>
 
-      <main className="main-content">
-        <div className="content-wrapper">
-          {tab === 'dashboard' && renderDashboard()}
-          {tab === 'form' && <FormTab />}
-          {tab === 'aidobot' && <RevolutionaryAidoBotPanel />}
-          {tab === 'analytics' && renderAnalytics()}
-          {tab === 'community' && renderCommunity()}
-          {tab === 'settings' && renderSettings()}
-          {tab === 'profile' && renderProfile()}
-        </div>
+      <main className="content-wrapper">
+        {tab === 'dashboard' && renderDashboard()}
+        {tab === 'form' && <FormTab />}
+        {tab === 'aidobot' && <RevolutionaryAidoBotPanel 
+          performanceMode={settings.performanceMode}
+          onSettingChange={handleSettingChange}
+        />}
+        {tab === 'analytics' && renderAnalytics()}
+        {tab === 'community' && renderCommunity()}
+        {tab === 'settings' && renderSettings()}
+        {tab === 'profile' && renderProfile()}
       </main>
 
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-section">
             <h4>AidoBot Panel Pro</h4>
-            <p>La solution ultime pour gérer votre serveur avec AidoBot avec style et efficacité.</p>
-            <div className="social-links">
-              <a href="#" className="social-link">
-                <i className="fab fa-discord"></i>
-              </a>
-              <a href="#" className="social-link">
-                <i className="fab fa-twitter"></i>
-              </a>
-              <a href="#" className="social-link">
-                <i className="fas fa-envelope"></i>
-              </a>
-            </div>
+            <p>La solution ultime pour gérer votre serveur Discord avec style et efficacité.</p>
           </div>
           <div className="footer-section">
             <h4>Fonctionnalités</h4>
@@ -756,25 +854,9 @@ function App() {
               <li><a href="#">Contact</a></li>
             </ul>
           </div>
-          <div className="footer-section">
-            <h4>Entreprise</h4>
-            <ul>
-              <li><a href="#">À propos</a></li>
-              <li><a href="#">Carrières</a></li>
-              <li><a href="#">Partenaires</a></li>
-              <li><a href="#">Presse</a></li>
-            </ul>
-          </div>
         </div>
         <div className="footer-bottom">
-          <div className="footer-bottom-content">
-            <p>&copy; 2025 AidoBot Panel Pro. Tous droits réservés.</p>
-            <div className="footer-links">
-              <a href="#">Confidentialité</a>
-              <a href="#">Conditions</a>
-              <a href="#">Cookies</a>
-            </div>
-          </div>
+          <p>&copy; 2025 AidoBot Panel Pro. Tous droits réservés.</p>
         </div>
       </footer>
     </div>

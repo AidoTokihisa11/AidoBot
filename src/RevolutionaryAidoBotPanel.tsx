@@ -24,6 +24,11 @@ interface Metrics {
   systemHealth: number;
 }
 
+interface AidoBotPanelProps {
+  performanceMode?: boolean;
+  onSettingChange?: (setting: string, value: boolean | string) => void;
+}
+
 // ============================================================================
 // HOOKS PERSONNALISÉS
 // ============================================================================
@@ -78,9 +83,13 @@ const usePerformance = () => {
 // COMPOSANT PRINCIPAL
 // ============================================================================
 
-export const RevolutionaryAidoBotPanel = () => {
+export const RevolutionaryAidoBotPanel = ({ 
+  performanceMode = false, 
+  onSettingChange 
+}: AidoBotPanelProps) => {
   // États principaux
   const [activeModule, setActiveModule] = useState('dashboard');
+  const [panelDarkMode, setPanelDarkMode] = useState(false); // Mode sombre spécifique au panneau
   const [modules, setModules] = useState<ModuleState[]>([
     { id: 'welcome', name: 'Système d\'accueil automatisé', enabled: true, aiLevel: 92, performance: 96, lastUpdate: new Date() },
     { id: 'moderation', name: 'Modération adaptative', enabled: true, aiLevel: 95, performance: 94, lastUpdate: new Date() },
@@ -346,6 +355,32 @@ export const RevolutionaryAidoBotPanel = () => {
             {currentItem?.label || 'Tableau de Bord Principal'}
           </h1>
           <div className="aidobot-actions">
+            <button 
+              className={`action-btn ${panelDarkMode ? 'active' : ''}`}
+              onClick={() => setPanelDarkMode(!panelDarkMode)}
+              style={{
+                background: panelDarkMode 
+                  ? 'linear-gradient(135deg, #8b5cf6, #3b82f6)' 
+                  : 'rgba(139, 92, 246, 0.1)',
+                color: panelDarkMode ? 'white' : '#8b5cf6'
+              }}
+            >
+              <i className={panelDarkMode ? 'fas fa-moon' : 'fas fa-sun'}></i>
+              Mode sombre
+            </button>
+            <button 
+              className={`action-btn ${performanceMode ? 'active' : ''}`}
+              onClick={() => onSettingChange?.('performanceMode', !performanceMode)}
+              style={{
+                background: performanceMode 
+                  ? 'linear-gradient(135deg, #10b981, #059669)' 
+                  : 'rgba(16, 185, 129, 0.1)',
+                color: performanceMode ? 'white' : '#10b981'
+              }}
+            >
+              <i className="fas fa-tachometer-alt"></i>
+              {performanceMode ? 'Performance ON' : 'Performance OFF'}
+            </button>
             <button className="action-btn">
               <i className="fas fa-chart-line"></i>
               Analyser Données
@@ -675,7 +710,7 @@ export const RevolutionaryAidoBotPanel = () => {
   };
 
   return (
-    <div className="aidobot-panel">
+    <div className={`aidobot-panel ${panelDarkMode ? 'aidobot-dark-mode' : ''}`}>
       {renderSidebar()}
       {renderContent()}
     </div>
